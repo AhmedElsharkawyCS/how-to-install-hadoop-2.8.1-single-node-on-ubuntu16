@@ -1,0 +1,318 @@
+=====================================
+#####################################
+=====================================
+
+-> "prerequist step we have to-install ssh server":
+
+$ sudo apt-get install openssh-server
+
+* "I f you encourage any problem when use ‘apt-get install ’ "
+-> use this commands 
+	$ sudo rm /var/lib/apt/lists/lock
+	$ sudo rm /var/cache/apt/archives/lock
+	$ sudo rm /var/lib/dpkg/lock
+
+-> then "to make your machine access to other machine without password use this command to genarate key between machines via":
+
+$  ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
+
+-> then "this command to copy public keys form id_rsa.pub to authorized_keys":
+  
+$ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+
+-> then "this command to change the mode to provide the owner with read and write permissions to authorized_keys file respectivel":
+
+$ chmod 0600 ~/.ssh/authorized_keys
+
+-> then "adds private key identities to the authentication agent":
+
+$ ssh-add
+ 
+=====================================
+#####################################
+=====================================
+
+
+install java:
+
+$ sudo apt-get install default-jre
+$ sudo apt-get install default-jdk
+
+ 
+=====================================
+#####################################
+=====================================
+
+*Download hadoop From
+
+http://www-eu.apache.org/dist/hadoop/common/
+
+-> then "copy the downloaded file to 'usr/local' it require super user permission": 
+
+$ sudo cp Downloads/hadoop-2.8.1.tar.gz /usr/local
+
+-> then change dir to  'usr/local' and  'extract it':
+
+$ sudo tar -xvf hadoop-2.8.1.tar.gz
+
+-> then "give it permission via":
+
+$ sudo chown mahamed:root -R /usr/local/hadoop-2.8.1
+$ sudo chmod 777 -R /usr/local/hadoop-2.8.1/*
+
+=====================================
+#####################################
+=====================================
+
+-> "create hadoop_tmp/hdfs" :
+
+$ sudo mkdir -p /usr/local/hadoop_tmp/hdfs
+
+-> then "give it permission via":
+
+$ sudo chown mahamed:root -R /usr/local/hadoop_tmp
+
+-> then "give it privlliges":
+
+$ sudo chmod 777 -R /usr/local/hadoop_tmp/*
+
+
+=====================================
+#####################################
+=====================================
+
+-> "excute this command to get the 'JAVA_HOME' path" 
+
+$ update-alternatives --config java
+
+* "take the path till '/jre' "
+
+-> "for example after excutiing this command you will get":
+
+--- "/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java"
+
+---- "we will take":
+
+------  JAVA_HOME = /usr/lib/jvm/java-8-openjdk-amd64 "only"
+
+##########################################
+
+-> then "Update '~/.bashrc' file via":
+
+-> "first open new terminal"
+$ cd ~
+$ sudo gedit .bashrc
+
+-> "add the following to the end of file after modify the JAVA_HOME and HADOOP_HOME,to Correct path you ":
+
+# -- HADOOP ENVIRONMENT VARIABLES START -- #
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export HADOOP_HOME=/usr/local/hadoop-2.8.1
+export PATH=$PATH:$HADOOP_HOME/bin
+export PATH=$PATH:$HADOOP_HOME/sbin
+export HADOOP_MAPRED_HOME=$HADOOP_HOME
+export HADOOP_COMMON_HOME=$HADOOP_HOME
+export HADOOP_HDFS_HOME=$HADOOP_HOME
+export YARN_HOME=$HADOOP_HOME
+export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
+export HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib"
+# -- HADOOP ENVIRONMENT VARIABLES END -- #
+
+-> then 
+
+$ source ~/.bashrc
+
+=====================================
+#####################################
+=====================================
+
+
+* "hadoop Configuration files":
+
+-> "frist go to hadoop directory in 'usr/local' "
+
+$ cd /usr/local/hadoop-2.8.1
+
+-> then "go to 'etc/hadoop' directory" 
+
+$ cd etc/hadoop
+
+-> then we will edit the hadoop Configuration files:
+
+1- hadoop-env.sh
+2- core-site.xml
+3- hdfs-site.xml
+4- yarn-site.xm
+5- mapred-site.xm
+=====================================
+#####################################
+=====================================
+
+1 - Configure "hadoop-env.sh" file
+
+$ sudo gedit hadoop-env.sh
+
+-> and at the end of file write
+
+JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
+=====================================
+#####################################
+=====================================
+
+2 - Configure "core-site.xml" file
+
+$ sudo gedit core-site.xml
+
+-> and write this property tags into configuration tag
+
+<property>
+<name>hadoop.tmp.dir</name>
+<value>/usr/local/hadoop_tmp/hadoop-${user.name}</value> 
+</property>
+
+<property>
+<name>fs.defaultFS</name>
+<value>hdfs://localhost:9000</value> 
+</property>
+
+=====================================
+#####################################
+=====================================
+
+3 - Configure "hdfs-site.xml" file
+
+$ sudo gedit hdfs-site.xml
+
+-> and write thos properties tags into configuration tag
+
+<property>
+  <name>dfs.replication</name>
+  <value>1</value> 
+</property>
+<property>
+  <name>dfs.name.dir</name>
+  <value>/usr/local/hadoop_tmp/hdfs/namenode</value> 
+</property>
+<property>
+  <name>dfs.data.dir</name>
+  <value>/usr/local/hadoop_tmp/hdfs/datanode</value> 
+</property> 
+
+=====================================
+#####################################
+=====================================
+
+4 - Configure "yarn-site.xml" file
+
+$ sudo gedit yarn-site.xml
+
+-> and write thos properties tags into configuration tag
+
+<property>
+  <name>yarn.nodemanager.aux.services</name>
+  <value>mapreduce_shuffle</value> 
+</property>
+<property>
+  <name>yarn.nodemanager.aux.services.mapreduce.shuffle.class</name>
+  <value>org.apache.hadoop.mapred.shuffleHandler</value> 
+</property>
+
+=====================================
+#####################################
+=====================================
+
+5 - Configure "mapred-site.xml" file
+
+#there is no file mapred-site.xml exist we will copy it from its template
+##copy template of mapred-site.xml.template file via:
+
+$ sudo cp /usr/local/hadoop-2.8.1/etc/hadoop/mapred-site.xml.template /usr/local/hadoop-2.8.1/etc/hadoop/mapred-site.xml
+
+-> then edit the file  using:
+
+$ sudo gedit mapred-site.xml
+
+-> and write this property tag into configuration tag
+
+<property>
+  <name>mapreduce.framework.name</name>
+  <value>yarn</value> 
+</property>
+ 
+=====================================
+#####################################
+=====================================
+
+* "finaly Format the Namenode ":
+
+-> go to hadoop directory 'usr/local/hadoop-2.8.1':
+
+$ cd /usr/local/hadoop-2.8.1
+
+$ bin/hadoop namenode -format
+
+=====================================
+#####################################
+=====================================
+
+* "Start all Hadoop daemons":
+
+$ sbin/start-all.sh
+
+-> "if told u that stop it first u must stop it via":
+
+$ sbin/stop-all.sh
+
+-> "and then start it again"
+
+=====================================
+#####################################
+=====================================
+
+* "Last thing to grantee you work is done correctly fire 'jps'":
+
+$ jps
+
+-> you should find:
+
+-- NameNode
+--- DataNode
+---- NodeManager
+----- ResourceManager
+------ SecondaryNameNode
+------- Jps
+
+-> ensure that datanode and namenode is exist
+-> if not 
+
+->first delete all contents from temporary folder:
+
+$ sudo rm -Rf /usr/local/hadoop_tmp  
+$ sudo mkdir -p /usr/local/hadoop_tmp/hdfs 
+$ sudo chown {your-username}:root -R /usr/local/hadoop_tmp 
+$ sudo chmod 777 -R /usr/local/hadoop_tmp/*
+
+->format the namenode: 
+
+$ hadoop namenode -format
+
+->start all processes again:
+
+$ sbin/start-all.sh
+
+=====================================
+#####################################
+=====================================
+then open the namenode site:
+localhost:50070
+and the yarn site:
+localhost:8088
+
+=====================================
+#####################################
+=====================================
+
+thank you 
+yehiasalah
+_________________________________
